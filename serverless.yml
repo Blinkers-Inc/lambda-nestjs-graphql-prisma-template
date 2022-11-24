@@ -2,6 +2,8 @@ service: lambda-nestjs-graphql-prisma
 
 frameworkVersion: "3"
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs14.x
@@ -13,6 +15,7 @@ provider:
   #   serverSideEncryption: AES256
 
 plugins:
+  - serverless-dotenv-plugin
   - serverless-layers
   - serverless-offline
 
