@@ -1,16 +1,33 @@
-service: songs-api
+service: lambda-nestjs-graphql-prisma
 
-frameworkVersion: '3'
-
-plugins:
-  - serverless-jetpack
-  - serverless-offline
+frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs14.x
   profile: blinkers
+  stage: ${opt:stage, 'dev'}
   region: ap-northeast-2 # or whatever your region is
+  # deploymentBucket:
+  #   name: lambda-nestjs-graphql-prisma-${self:provider.stage}
+  #   serverSideEncryption: AES256
+
+plugins:
+  - serverless-layers
+  - serverless-offline
+
+custom:
+  serverless-layers:
+    functions:
+      - api
+    dependenciesPath: ./package.json
+    layersDeploymentBucket: lambda-nestjs-graphql-prisma-layers-${self:provider.stage}
+
+package:
+  individually: true
+  patterns:
+    - "!node_modules/**"
+    - "!.git/**"
 
 functions:
   api:

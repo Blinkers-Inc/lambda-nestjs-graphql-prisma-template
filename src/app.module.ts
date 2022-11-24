@@ -1,9 +1,10 @@
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { DirectiveLocation, GraphQLDirective } from 'graphql';
-import { upperDirectiveTransformer } from './common/directives/upper-case.directive';
-import { RecipesModule } from './recipes/recipes.module';
+import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
+import { Module } from "@nestjs/common";
+import { GraphQLModule } from "@nestjs/graphql";
+import { DirectiveLocation, GraphQLDirective } from "graphql";
+
+import { upperDirectiveTransformer } from "./common/directives/upper-case.directive";
+import { RecipesModule } from "./recipes/recipes.module";
 
 @Module({
   imports: [
@@ -11,12 +12,12 @@ import { RecipesModule } from './recipes/recipes.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
-      transformSchema: schema => upperDirectiveTransformer(schema, 'upper'),
+      transformSchema: (schema) => upperDirectiveTransformer(schema, "upper"),
       installSubscriptionHandlers: true,
       buildSchemaOptions: {
         directives: [
           new GraphQLDirective({
-            name: 'upper',
+            name: "upper",
             locations: [DirectiveLocation.FIELD_DEFINITION],
           }),
         ],

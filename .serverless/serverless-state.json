@@ -1,15 +1,15 @@
 {
   "service": {
-    "service": "songs-api",
+    "service": "lambda-nestjs-graphql-prisma",
     "serviceObject": {
-      "name": "songs-api"
+      "name": "lambda-nestjs-graphql-prisma"
     },
     "provider": {
       "name": "aws",
       "runtime": "nodejs14.x",
       "profile": "blinkers",
-      "region": "ap-northeast-2",
       "stage": "dev",
+      "region": "ap-northeast-2",
       "versionFunctions": true,
       "compiledCloudFormationTemplate": {
         "AWSTemplateFormatVersion": "2010-09-09",
@@ -87,7 +87,7 @@
           "ApiLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/songs-api-dev-api"
+              "LogGroupName": "/aws/lambda/lambda-nestjs-graphql-prisma-dev-api"
             }
           },
           "IamRoleLambdaExecution": {
@@ -115,7 +115,7 @@
                     "Fn::Join": [
                       "-",
                       [
-                        "songs-api",
+                        "lambda-nestjs-graphql-prisma",
                         "dev",
                         "lambda"
                       ]
@@ -132,7 +132,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/songs-api-dev*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambda-nestjs-graphql-prisma-dev*:*"
                           }
                         ]
                       },
@@ -143,7 +143,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/songs-api-dev*:*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lambda-nestjs-graphql-prisma-dev*:*:*"
                           }
                         ]
                       }
@@ -156,7 +156,7 @@
                 "Fn::Join": [
                   "-",
                   [
-                    "songs-api",
+                    "lambda-nestjs-graphql-prisma",
                     "dev",
                     {
                       "Ref": "AWS::Region"
@@ -174,11 +174,11 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/songs-api/dev/1669184978567-2022-11-23T06:29:38.567Z/songs-api.zip"
+                "S3Key": "serverless/lambda-nestjs-graphql-prisma/dev/1669256837763-2022-11-24T02:27:17.763Z/api.zip"
               },
               "Handler": "dist/lambda.handler",
               "Runtime": "nodejs14.x",
-              "FunctionName": "songs-api-dev-api",
+              "FunctionName": "lambda-nestjs-graphql-prisma-dev-api",
               "MemorySize": 1024,
               "Timeout": 6,
               "Role": {
@@ -186,26 +186,29 @@
                   "IamRoleLambdaExecution",
                   "Arn"
                 ]
-              }
+              },
+              "Layers": [
+                "arn:aws:lambda:ap-northeast-2:115300776262:layer:lambda-nestjs-graphql-prisma-dev-nodejs-default:5"
+              ]
             },
             "DependsOn": [
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersionV1Vik3SqmjA1eWxb5cmcmrEUJFbhcGCZDmI1fvb34": {
+          "ApiLambdaVersionjZh0inj4v6rwz1AT5yYTPyynKpuLQWLPhJ3IfuyGE": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "GTa6RUTd1TK/WRFuQMoIin77hr8T4RrDSd079s4WIJs="
+              "CodeSha256": "yISu5BJRx10Gzm2DBfu1y5lZQoJ6XkAwT3U3g8HqnGM="
             }
           },
           "ApiGatewayRestApi": {
             "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
-              "Name": "dev-songs-api",
+              "Name": "dev-lambda-nestjs-graphql-prisma",
               "EndpointConfiguration": {
                 "Types": [
                   "EDGE"
@@ -275,7 +278,7 @@
               "ApiLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1669184972011": {
+          "ApiGatewayDeployment1669256805974": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -331,16 +334,16 @@
               "Ref": "ServerlessDeploymentBucket"
             },
             "Export": {
-              "Name": "sls-songs-api-dev-ServerlessDeploymentBucketName"
+              "Name": "sls-lambda-nestjs-graphql-prisma-dev-ServerlessDeploymentBucketName"
             }
           },
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionV1Vik3SqmjA1eWxb5cmcmrEUJFbhcGCZDmI1fvb34"
+              "Ref": "ApiLambdaVersionjZh0inj4v6rwz1AT5yYTPyynKpuLQWLPhJ3IfuyGE"
             },
             "Export": {
-              "Name": "sls-songs-api-dev-ApiLambdaFunctionQualifiedArn"
+              "Name": "sls-lambda-nestjs-graphql-prisma-dev-ApiLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -366,7 +369,13 @@
               ]
             },
             "Export": {
-              "Name": "sls-songs-api-dev-ServiceEndpoint"
+              "Name": "sls-lambda-nestjs-graphql-prisma-dev-ServiceEndpoint"
+            }
+          },
+          "LambdaDashnestjsDashgraphqlDashprismaDashdevDashnodejsDashdefaultLambdaLayerQualifiedArn": {
+            "Value": "arn:aws:lambda:ap-northeast-2:115300776262:layer:lambda-nestjs-graphql-prisma-dev-nodejs-default:5",
+            "Export": {
+              "Name": "LambdaDashnestjsDashgraphqlDashprismaDashdevDashnodejsDashdefaultLambdaLayerQualifiedArn"
             }
           }
         }
@@ -455,8 +464,17 @@
       },
       "vpc": {}
     },
+    "custom": {
+      "serverless-layers": {
+        "functions": [
+          "api"
+        ],
+        "dependenciesPath": "./package.json",
+        "layersDeploymentBucket": "lambda-nestjs-graphql-prisma-layers-dev"
+      }
+    },
     "plugins": [
-      "serverless-jetpack",
+      "serverless-layers",
       "serverless-offline"
     ],
     "pluginsData": {},
@@ -472,25 +490,52 @@
             }
           }
         ],
-        "name": "songs-api-dev-api",
-        "package": {},
+        "name": "lambda-nestjs-graphql-prisma-dev-api",
+        "layers": {
+          "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"ApiLambdaFunction\"][\"Properties\"][\"Layers\"]"
+        },
+        "package": {
+          "artifact": "/Users/dankimhaejun/blinkers/lambda-nestjs-graphql-prisma/.serverless/api.zip"
+        },
         "memory": 1024,
         "timeout": 6,
         "runtime": "nodejs14.x",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersionV1Vik3SqmjA1eWxb5cmcmrEUJFbhcGCZDmI1fvb34"
+        "versionLogicalId": "ApiLambdaVersionjZh0inj4v6rwz1AT5yYTPyynKpuLQWLPhJ3IfuyGE"
       }
+    },
+    "resources": {
+      "Outputs": {
+        "LambdaDashnestjsDashgraphqlDashprismaDashdevDashnodejsDashdefaultLambdaLayerQualifiedArn": {
+          "Value": "arn:aws:lambda:ap-northeast-2:115300776262:layer:lambda-nestjs-graphql-prisma-dev-nodejs-default:5",
+          "Export": {
+            "Name": "LambdaDashnestjsDashgraphqlDashprismaDashdevDashnodejsDashdefaultLambdaLayerQualifiedArn"
+          }
+        }
+      },
+      "Resources": {}
     },
     "configValidationMode": "warn",
     "serviceFilename": "serverless.yml",
     "initialServerlessConfig": {
-      "service": "songs-api",
+      "service": "lambda-nestjs-graphql-prisma",
       "frameworkVersion": "3",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
       "plugins": {
         "$ref": "$[\"service\"][\"plugins\"]"
       },
-      "provider": {
-        "$ref": "$[\"service\"][\"provider\"]"
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
+      },
+      "package": {
+        "individually": true,
+        "patterns": [
+          "!node_modules/**",
+          "!.git/**"
+        ],
+        "artifactsS3KeyDirname": "serverless/lambda-nestjs-graphql-prisma/dev/code-artifacts"
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
@@ -500,7 +545,8 @@
     "isDashboardMonitoringPreconfigured": false
   },
   "package": {
-    "artifactDirectoryName": "serverless/songs-api/dev/1669184978567-2022-11-23T06:29:38.567Z",
-    "artifact": "songs-api.zip"
+    "individually": true,
+    "artifactDirectoryName": "serverless/lambda-nestjs-graphql-prisma/dev/1669256837763-2022-11-24T02:27:17.763Z",
+    "artifact": ""
   }
 }
