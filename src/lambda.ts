@@ -1,4 +1,4 @@
-import { ValidationPipe } from "@nestjs/common/pipes/validation.pipe";
+import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { configure as serverlessExpress } from "@vendia/serverless-express";
 
