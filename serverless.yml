@@ -10,13 +10,15 @@ provider:
   profile: blinkers
   stage: ${opt:stage, 'dev'}
   region: ap-northeast-2 # or whatever your region is
-  # deploymentBucket:
-  #   name: lambda-nestjs-graphql-prisma-${self:provider.stage}
-  #   serverSideEncryption: AES256
+  deploymentBucket:
+    name: lambda-nestjs-graphql-prisma-${self:provider.stage}
+    serverSideEncryption: AES256
 
 plugins:
   - serverless-dotenv-plugin
   - serverless-layers
+  - serverless-webpack
+  - serverless-webpack-prisma
   - serverless-offline
 
 custom:
@@ -25,6 +27,10 @@ custom:
       - api
     dependenciesPath: ./package.json
     layersDeploymentBucket: lambda-nestjs-graphql-prisma-layers-${self:provider.stage}
+  webpack:
+    includeModules:
+      forceExclude:
+        - graphql # layers 내 graphql과 버전 conflict로 인해 제외
 
 package:
   individually: true

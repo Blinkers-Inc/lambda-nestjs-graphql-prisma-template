@@ -6,7 +6,7 @@ import { AppModule } from "./app.module";
 
 let cachedServer;
 
-export const handler = async (event, context) => {
+export const handler = async (event, context, callback) => {
   if (!cachedServer) {
     const nestApp = await NestFactory.create(AppModule);
     nestApp.useGlobalPipes(new ValidationPipe());
@@ -14,8 +14,13 @@ export const handler = async (event, context) => {
 
     cachedServer = serverlessExpress({
       app: nestApp.getHttpAdapter().getInstance(),
+      logSettings: {
+        level: "error", // default: 'error'
+      },
+      resolutionMode: "CALLBACK", // If you specify 'CALLBACK', then context.callbackWaitsForEmptyEventLoop = false is also set for you.
+      respondWithErrors: true, // default: process.env.NODE_ENV === 'development'
     });
   }
 
-  return cachedServer(event, context);
+  return cachedServer(event, context, callback);
 };

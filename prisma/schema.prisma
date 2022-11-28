@@ -1,0 +1,576 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model admin_deposit {
+  uuid                  String             @id @db.Uuid
+  created_at            DateTime           @db.Timestamp(6)
+  is_active             Boolean
+  is_delete             Boolean
+  updated_at            DateTime           @db.Timestamp(6)
+  status                AdminDepositStatus
+  price                 BigInt
+  my_nft_con_uuid       String?            @db.Uuid
+  market_trade_log_uuid String?            @db.Uuid
+}
+
+model banner {
+  uuid        String   @id @db.Uuid
+  created_at  DateTime @db.Timestamp(6)
+  is_active   Boolean
+  is_delete   Boolean
+  updated_at  DateTime @db.Timestamp(6)
+  creator     String   @db.VarChar(255)
+  updater     String   @db.VarChar(255)
+  bannerjson  String?
+  banner_type String?  @db.VarChar(255)
+  description String?
+  sort        Int?
+}
+
+model batch_job_execution {
+  job_execution_id            BigInt                       @id
+  version                     BigInt?
+  job_instance_id             BigInt
+  create_time                 DateTime                     @db.Timestamp(6)
+  start_time                  DateTime?                    @db.Timestamp(6)
+  end_time                    DateTime?                    @db.Timestamp(6)
+  status                      String?                      @db.VarChar(10)
+  exit_code                   String?                      @db.VarChar(2500)
+  exit_message                String?                      @db.VarChar(2500)
+  last_updated                DateTime?                    @db.Timestamp(6)
+  job_configuration_location  String?                      @db.VarChar(2500)
+  batch_job_instance          batch_job_instance           @relation(fields: [job_instance_id], references: [job_instance_id], onDelete: NoAction, onUpdate: NoAction, map: "job_inst_exec_fk")
+  batch_job_execution_context batch_job_execution_context?
+  batch_job_execution_params  batch_job_execution_params[] @ignore
+  batch_step_execution        batch_step_execution[]
+}
+
+model batch_job_execution_context {
+  job_execution_id    BigInt              @id
+  short_context       String              @db.VarChar(2500)
+  serialized_context  String?
+  batch_job_execution batch_job_execution @relation(fields: [job_execution_id], references: [job_execution_id], onDelete: NoAction, onUpdate: NoAction, map: "job_exec_ctx_fk")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model batch_job_execution_params {
+  job_execution_id    BigInt
+  type_cd             String              @db.VarChar(6)
+  key_name            String              @db.VarChar(100)
+  string_val          String?             @db.VarChar(250)
+  date_val            DateTime?           @db.Timestamp(6)
+  long_val            BigInt?
+  double_val          Float?
+  identifying         String              @db.Char(1)
+  batch_job_execution batch_job_execution @relation(fields: [job_execution_id], references: [job_execution_id], onDelete: NoAction, onUpdate: NoAction, map: "job_exec_params_fk")
+
+  @@ignore
+}
+
+model batch_job_instance {
+  job_instance_id     BigInt                @id
+  version             BigInt?
+  job_name            String                @db.VarChar(100)
+  job_key             String                @db.VarChar(32)
+  batch_job_execution batch_job_execution[]
+
+  @@unique([job_name, job_key], map: "job_inst_un")
+}
+
+model batch_step_execution {
+  step_execution_id            BigInt                        @id
+  version                      BigInt
+  step_name                    String                        @db.VarChar(100)
+  job_execution_id             BigInt
+  start_time                   DateTime                      @db.Timestamp(6)
+  end_time                     DateTime?                     @db.Timestamp(6)
+  status                       String?                       @db.VarChar(10)
+  commit_count                 BigInt?
+  read_count                   BigInt?
+  filter_count                 BigInt?
+  write_count                  BigInt?
+  read_skip_count              BigInt?
+  write_skip_count             BigInt?
+  process_skip_count           BigInt?
+  rollback_count               BigInt?
+  exit_code                    String?                       @db.VarChar(2500)
+  exit_message                 String?                       @db.VarChar(2500)
+  last_updated                 DateTime?                     @db.Timestamp(6)
+  batch_job_execution          batch_job_execution           @relation(fields: [job_execution_id], references: [job_execution_id], onDelete: NoAction, onUpdate: NoAction, map: "job_exec_step_fk")
+  batch_step_execution_context batch_step_execution_context?
+}
+
+model batch_step_execution_context {
+  step_execution_id    BigInt               @id
+  short_context        String               @db.VarChar(2500)
+  serialized_context   String?
+  batch_step_execution batch_step_execution @relation(fields: [step_execution_id], references: [step_execution_id], onDelete: NoAction, onUpdate: NoAction, map: "step_exec_ctx_fk")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model biz_log_202207 {
+  cmid            String?   @db.VarChar(32)
+  umid            String?   @db.VarChar(32)
+  msg_type        Int?
+  status          Int?
+  call_status     String?   @db.VarChar(4)
+  request_time    DateTime? @db.Timestamp(6)
+  send_time       DateTime? @db.Timestamp(6)
+  report_time     DateTime? @db.Timestamp(6)
+  dest_phone      String?   @db.VarChar(16)
+  send_phone      String?   @db.VarChar(16)
+  dest_name       String?   @db.VarChar(32)
+  send_name       String?   @db.VarChar(32)
+  subject         String?   @db.VarChar(64)
+  msg_body        String?   @db.VarChar(2000)
+  nation_code     String?   @db.VarChar(5)
+  sender_key      String?   @db.VarChar(40)
+  template_code   String?   @db.VarChar(64)
+  response_method String?   @db.VarChar(8)
+  timeout         Int?
+  re_type         String?   @db.VarChar(3)
+  re_body         String?   @db.VarChar(2000)
+  re_part         String?   @db.VarChar(1)
+  cover_flag      Int?
+  sms_flag        Int?
+  reply_flag      Int?
+  retry_cnt       Int?
+  attached_file   String?   @db.VarChar(1000)
+  vxml_file       String?   @db.VarChar(64)
+  use_page        Int?
+  use_time        Int?
+  sn_result       Int?
+  tel_info        String?   @db.VarChar(10)
+  cinfo           String?   @db.VarChar(32)
+  user_key        String?   @db.VarChar(30)
+  ad_flag         String?   @db.VarChar(1)
+  rcs_refkey      String?   @db.VarChar(32)
+
+  @@ignore
+}
+
+model biz_msg {
+  cmid            String    @id(map: "tb_biz_msg_cmid_pk") @db.VarChar(32)
+  umid            String?   @db.VarChar(32)
+  msg_type        Int?      @default(0)
+  status          Int?      @default(0)
+  call_status     String?   @db.VarChar(4)
+  request_time    DateTime  @db.Timestamp(6)
+  send_time       DateTime  @db.Timestamp(6)
+  report_time     DateTime? @db.Timestamp(6)
+  dest_phone      String?   @db.VarChar(16)
+  send_phone      String?   @db.VarChar(16)
+  dest_name       String?   @db.VarChar(32)
+  send_name       String?   @db.VarChar(32)
+  subject         String?   @db.VarChar(64)
+  msg_body        String?   @db.VarChar(2000)
+  nation_code     String?   @db.VarChar(5)
+  sender_key      String?   @db.VarChar(40)
+  template_code   String?   @db.VarChar(64)
+  response_method String?   @db.VarChar(8)
+  timeout         Int?
+  re_type         String?   @default("N") @db.VarChar(3)
+  re_body         String?   @db.VarChar(2000)
+  re_part         String?   @db.VarChar(1)
+  cover_flag      Int?      @default(0)
+  sms_flag        Int?      @default(0)
+  reply_flag      Int?      @default(0)
+  retry_cnt       Int?
+  attached_file   String?   @db.VarChar(1000)
+  vxml_file       String?   @db.VarChar(64)
+  use_page        Int?      @default(0)
+  use_time        Int?      @default(0)
+  sn_result       Int?      @default(0)
+  tel_info        String?   @db.VarChar(10)
+  cinfo           String?   @db.VarChar(32)
+  user_key        String?   @db.VarChar(30)
+  ad_flag         String?   @db.VarChar(1)
+  rcs_refkey      String?   @db.VarChar(32)
+}
+
+model deposit {
+  uuid                 String       @id @db.Uuid
+  created_at           DateTime     @db.Timestamp(6)
+  is_active            Boolean
+  is_delete            Boolean
+  updated_at           DateTime     @db.Timestamp(6)
+  avail_deposit_sum    BigInt
+  deposit_sum          BigInt
+  pending_deposit_sum  BigInt
+  pending_withdraw_sum BigInt
+  member_uid           String       @db.VarChar(255)
+  member               member       @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fkmrmrrvmgoi29xf0ccackh6j4a")
+  deposit_tx           deposit_tx[]
+  trade_tx             trade_tx[]
+}
+
+model deposit_tx {
+  uuid                 String           @id @db.Uuid
+  created_at           DateTime         @db.Timestamp(6)
+  is_active            Boolean
+  is_delete            Boolean
+  updated_at           DateTime         @db.Timestamp(6)
+  admin_memo           String?
+  deposit_amnt         BigInt?
+  deposit_at           DateTime?        @db.Timestamp(6)
+  deposit_req_amnt     BigInt?
+  deposit_tx_ty        String?          @db.VarChar(255)
+  description          String?
+  from_account_holder  String?          @db.VarChar(255)
+  from_bnk_account_no  String?          @db.VarChar(255)
+  from_bnk_nm          String?          @db.VarChar(255)
+  to_account_holder    String?          @db.VarChar(255)
+  to_bnk_account_no    String?          @db.VarChar(255)
+  to_bnk_nm            String?          @db.VarChar(255)
+  tx_approve_at        DateTime?        @db.Timestamp(6)
+  tx_request_at        DateTime?        @db.Timestamp(6)
+  tx_status            String?          @db.VarChar(255)
+  deposit_uuid         String           @db.Uuid
+  member_uid           String           @db.VarChar(255)
+  deposit_tx_noti_uuid String?          @unique(map: "uk_5uq0m1ipxfmo2e9x5p1t74oaw") @db.Uuid
+  member               member           @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fk26qi2sbqa4ygpqo3lixkb71xy")
+  deposit              deposit          @relation(fields: [deposit_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fk5ouim5m7v2xn2jt34j10dbi9")
+  deposit_tx_noti      deposit_tx_noti? @relation(fields: [deposit_tx_noti_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fkcrtyhk1ixkkvaqyj1dxrbwubn")
+}
+
+model deposit_tx_noti {
+  uuid           String      @id @db.Uuid
+  created_at     DateTime    @db.Timestamp(6)
+  is_active      Boolean
+  is_delete      Boolean
+  updated_at     DateTime    @db.Timestamp(6)
+  tx_noti_status String?     @db.VarChar(255)
+  deposit_tx     deposit_tx?
+}
+
+model market_trade_log {
+  uuid                String            @id @db.Uuid
+  created_at          DateTime          @db.Timestamp(6)
+  is_active           Boolean
+  is_delete           Boolean
+  updated_at          DateTime          @db.Timestamp(6)
+  status              MarketTradeStatus
+  my_nft_con_uuid     String            @db.Uuid
+  from                String            @db.VarChar(255)
+  to                  String?           @db.VarChar(255)
+  commission          BigInt
+  sub_total           BigInt
+  total               BigInt
+  token_owner_address String?           @db.VarChar(255)
+}
+
+model market_trade_tx {
+  uuid                  String            @id @db.Uuid
+  created_at            DateTime          @db.Timestamp(6)
+  is_active             Boolean
+  is_delete             Boolean
+  updated_at            DateTime          @db.Timestamp(6)
+  buyer_uid             String
+  buyer_wallet_address  String
+  seller_uid            String
+  seller_wallet_address String
+  status                MarketTradeStatus
+  transaction_hash      String
+  my_nft_con_uuid       String            @db.Uuid
+  nft_con_edition_uuid  String            @db.Uuid
+  market_trade_log_uuid String            @db.Uuid
+  admin_deposit_uuid    String            @db.Uuid
+  admin_commission      BigInt
+  buyer_spend           BigInt
+  seller_earn           BigInt
+}
+
+model member {
+  uid             String         @id @db.VarChar(255)
+  created_at      DateTime       @db.Timestamp(6)
+  is_active       Boolean
+  is_delete       Boolean
+  updated_at      DateTime       @db.Timestamp(6)
+  birthday        DateTime?      @db.Timestamp(6)
+  deposit_cd      String?        @db.VarChar(255)
+  email           String         @db.VarChar(255)
+  agreed_mkt_plcy Boolean
+  name            String?        @db.VarChar(255)
+  nick_nm         String?        @db.VarChar(255)
+  phone           String?        @db.VarChar(255)
+  privacy_of_plcy Boolean
+  terms_of_srv    Boolean
+  verify_age      Boolean?
+  deposit         deposit[]
+  deposit_tx      deposit_tx[]
+  mnft_tx         mnft_tx[]
+  my_mnft         my_mnft[]
+  my_nft_con      my_nft_con[]
+  participant     participant[]
+  redeem_tx       redeem_tx[]
+  trade_result    trade_result[]
+  trade_tx        trade_tx[]
+  wallet          wallet[]
+}
+
+model mnft_tx {
+  uuid                  String    @id @db.Uuid
+  created_at            DateTime  @db.Timestamp(6)
+  is_active             Boolean
+  is_delete             Boolean
+  updated_at            DateTime  @db.Timestamp(6)
+  description           String?   @db.VarChar(255)
+  label_img_url         String?   @db.VarChar(255)
+  moment_memory_img_url String?   @db.VarChar(255)
+  participants          String?
+  signature_img_url     String?   @db.VarChar(255)
+  status                String?   @db.VarChar(255)
+  tasted_at             DateTime? @db.Timestamp(6)
+  tx_approve_at         DateTime? @db.Timestamp(6)
+  tx_request_at         DateTime? @db.Timestamp(6)
+  member_uid            String    @db.VarChar(255)
+  my_mnft_uuid          String    @unique(map: "uk_ngj0stg2q894i3io6ei8f2ng7") @db.Uuid
+  my_mnft               my_mnft   @relation(fields: [my_mnft_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fkmgt1t12wn64urqythd6d4gvop")
+  member                member    @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fkoa7ieihn7eq8ffucle2h2dcx5")
+}
+
+model my_mnft {
+  uuid                  String        @id @db.Uuid
+  created_at            DateTime      @db.Timestamp(6)
+  is_active             Boolean
+  is_delete             Boolean
+  updated_at            DateTime      @db.Timestamp(6)
+  description           String?       @db.VarChar(255)
+  gif_url               String?       @db.VarChar(255)
+  image_url             String?       @db.VarChar(255)
+  label_img_url         String?       @db.VarChar(255)
+  moment_memory_img_url String?       @db.VarChar(255)
+  price                 Float?        @db.Real
+  signature_img_url     String?       @db.VarChar(255)
+  status                String?       @db.VarChar(255)
+  tasted_at             DateTime      @db.Timestamp(6)
+  token_id              String?       @db.VarChar(255)
+  type                  String?       @db.VarChar(255)
+  member_uid            String        @db.VarChar(255)
+  mynft_uuid            String        @db.Uuid
+  contract_address      String?       @db.VarChar(255)
+  member                member        @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fk60912awbp51w1vc32q4uolq16")
+  my_nft_con            my_nft_con    @relation(fields: [mynft_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fka8i6tjwv4o5gtt1m56xas1sac")
+  mnft_tx               mnft_tx?
+  participant           participant[]
+}
+
+model my_nft_con {
+  uuid                 String          @id @db.Uuid
+  created_at           DateTime        @db.Timestamp(6)
+  is_active            Boolean
+  is_delete            Boolean
+  updated_at           DateTime        @db.Timestamp(6)
+  deposit_at           DateTime?       @db.Timestamp(6)
+  seller_id            String?         @db.VarChar(255)
+  status               String          @db.VarChar(255)
+  member_uid           String          @db.VarChar(255)
+  nft_con_edition_uuid String          @db.Uuid
+  is_burnt             Boolean?
+  token_id             String?         @db.VarChar(255)
+  contract_address     String?         @db.VarChar(255)
+  is_listing           Boolean         @default(false)
+  member               member          @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fkpe58693g6nuyw0s3qa124s7m")
+  nft_con_edition      nft_con_edition @relation(fields: [nft_con_edition_uuid], references: [uuid])
+  my_mnft              my_mnft[]
+  redeem_tx            redeem_tx?
+  trade_tx             trade_tx[]
+}
+
+model nft_con_edition {
+  uuid          String         @id @db.Uuid
+  created_at    DateTime       @db.Timestamp(6)
+  is_active     Boolean
+  is_delete     Boolean
+  updated_at    DateTime       @db.Timestamp(6)
+  creator       String         @db.VarChar(255)
+  updater       String         @db.VarChar(255)
+  edition_no    BigInt
+  minting_at    DateTime       @db.Timestamp(6)
+  status        String         @db.VarChar(255)
+  owner         String?        @db.VarChar(255)
+  price         BigInt
+  redeem_status String?        @db.VarChar(255)
+  sort          BigInt?
+  nft_con_uuid  String         @db.Uuid
+  nft_con_info  nft_con_info   @relation(fields: [nft_con_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fkhxp8uif8i5xqjtcc936wiqch9")
+  my_nft_con    my_nft_con[]
+  trade_result  trade_result[]
+  trade_tx      trade_tx[]
+}
+
+model nft_con_info {
+  uuid                    String            @id @db.Uuid
+  created_at              DateTime          @db.Timestamp(6)
+  is_active               Boolean
+  is_delete               Boolean
+  updated_at              DateTime          @db.Timestamp(6)
+  creator                 String            @db.VarChar(255)
+  updater                 String            @db.VarChar(255)
+  abv                     String?           @db.VarChar(255)
+  capacity                String?           @db.VarChar(255)
+  description_en          String?
+  description_ko          String?
+  grape_variety_en        String?           @db.VarChar(255)
+  grape_variety_ko        String?           @db.VarChar(255)
+  img_url                 String?           @db.VarChar(255)
+  name                    String            @db.VarChar(255)
+  nft_id                  String?           @db.VarChar(255)
+  region_en               String?           @db.VarChar(255)
+  region_ko               String?           @db.VarChar(255)
+  sort                    BigInt?
+  tier                    String            @db.VarChar(255)
+  type_en                 String            @db.VarChar(255)
+  type_ko                 String            @db.VarChar(255)
+  vintage                 String            @db.VarChar(255)
+  winery                  String?           @db.VarChar(255)
+  is_buyable              Boolean?
+  gif_bg_color            String?           @db.VarChar(255)
+  gif_url                 String?           @db.VarChar(255)
+  short_name              String            @db.VarChar(255)
+  static_frontal_img_url  String?           @db.VarChar(255)
+  static_diagonal_img_url String?           @db.VarChar(255)
+  nft_con_edition         nft_con_edition[]
+  nft_con_metadata        nft_con_metadata?
+}
+
+model nft_con_metadata {
+  uuid                       String                       @id @db.Uuid
+  nft_con_uuid               String                       @unique @db.Uuid
+  created_at                 DateTime                     @db.Timestamp(6)
+  is_active                  Boolean
+  is_delete                  Boolean
+  updated_at                 DateTime                     @db.Timestamp(6)
+  name                       String                       @db.VarChar(255)
+  description                String
+  image                      String
+  external_url               String
+  animation_url              String?
+  nft_con_info               nft_con_info                 @relation(fields: [nft_con_uuid], references: [uuid])
+  nft_con_metadata_attribute nft_con_metadata_attribute[]
+}
+
+model nft_con_metadata_attribute {
+  id                    Int              @id @default(autoincrement())
+  created_at            DateTime         @db.Timestamp(6)
+  is_active             Boolean
+  is_delete             Boolean
+  updated_at            DateTime         @db.Timestamp(6)
+  is_public             Boolean
+  trait_type            String           @db.VarChar(255)
+  display_type          String           @default("none")
+  string_value          String?
+  number_value          Float?
+  max_value             Float?
+  nft_con_metadata_uuid String           @db.Uuid
+  nft_con_metadata      nft_con_metadata @relation(fields: [nft_con_metadata_uuid], references: [uuid])
+}
+
+model participant {
+  uuid         String  @id @db.Uuid
+  member_uid   String  @db.VarChar(255)
+  my_mnft_uuid String  @db.Uuid
+  edition_no   BigInt
+  member       member  @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fkcfurr7ot0v8vyblqs821npnm1")
+  my_mnft      my_mnft @relation(fields: [my_mnft_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fknagcg1592ufsqj5nb4199nek4")
+}
+
+model redeem_tx {
+  uuid          String      @id @db.Uuid
+  created_at    DateTime    @db.Timestamp(6)
+  is_active     Boolean
+  is_delete     Boolean
+  updated_at    DateTime    @db.Timestamp(6)
+  location_cd   String?     @db.VarChar(255)
+  plcy_agreed   Boolean?
+  redeem_dt     DateTime?   @db.Timestamp(6)
+  status        String?     @db.VarChar(255)
+  tx_approve_at DateTime?   @db.Timestamp(6)
+  tx_request_at DateTime?   @db.Timestamp(6)
+  member_uid    String      @db.VarChar(255)
+  mynft_uuid    String?     @unique(map: "uk_472lrk2owu4bwu68lxg7a3msi") @db.Uuid
+  my_nft_con    my_nft_con? @relation(fields: [mynft_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fk9aw4meaa5i7eigcw3an22f5j")
+  member        member      @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fkd51svbrpytut6guwa09e88aym")
+}
+
+model sub_news_letter {
+  uuid       String   @id @db.Uuid
+  created_at DateTime @db.Timestamp(6)
+  is_active  Boolean
+  is_delete  Boolean
+  updated_at DateTime @db.Timestamp(6)
+  email      String?  @db.VarChar(255)
+}
+
+model trade_result {
+  uuid                 String           @id @db.Uuid
+  created_at           DateTime         @db.Timestamp(6)
+  is_active            Boolean
+  is_delete            Boolean
+  updated_at           DateTime         @db.Timestamp(6)
+  status               String?          @db.VarChar(255)
+  uid                  String           @db.VarChar(255)
+  nft_con_edition_uuid String?          @db.Uuid
+  nft_con_edition      nft_con_edition? @relation(fields: [nft_con_edition_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fkpe1gldley6tmvmkn9svifbnl")
+  member               member           @relation(fields: [uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fktax42ur6gt5vchsmmk3f20x69")
+}
+
+model trade_tx {
+  uuid               String          @id @db.Uuid
+  created_at         DateTime        @db.Timestamp(6)
+  is_active          Boolean
+  is_delete          Boolean
+  updated_at         DateTime        @db.Timestamp(6)
+  amount             BigInt?
+  buyeruid           String?         @db.VarChar(255)
+  buyerwalletaddress String?         @db.VarChar(255)
+  issuccess          Boolean?
+  selleruid          String?         @db.VarChar(255)
+  status             String?         @db.VarChar(255)
+  tx_approve_at      DateTime?       @db.Timestamp(6)
+  tx_request_at      DateTime?       @db.Timestamp(6)
+  deposit_uuid       String          @db.Uuid
+  member_uid         String          @db.VarChar(255)
+  mynft_uuid         String?         @db.Uuid
+  item_uuid          String          @db.Uuid
+  nft_con_edition    nft_con_edition @relation(fields: [item_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fk7jymgftumotyc6l6lu4c7cp69")
+  my_nft_con         my_nft_con?     @relation(fields: [mynft_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fkhd2ba8p6xfu7vjfm3uvbud295")
+  member             member          @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fkle4e3m3ee290mvjona82fxfip")
+  deposit            deposit         @relation(fields: [deposit_uuid], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "fksdi7xxq3npyx3680qd73h76ex")
+}
+
+model wallet {
+  uuid       String   @id @db.Uuid
+  created_at DateTime @db.Timestamp(6)
+  is_active  Boolean
+  is_delete  Boolean
+  updated_at DateTime @db.Timestamp(6)
+  address    String   @db.VarChar(255)
+  chain      String   @db.VarChar(255)
+  type       String   @db.VarChar(255)
+  member_uid String   @db.VarChar(255)
+  member     member   @relation(fields: [member_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction, map: "fkqd8obewuhmdx3nqsn5icn9n6e")
+}
+
+enum AdminDepositStatus {
+  DEPOSIT
+  WITHDRAW
+}
+
+enum MarketTradeStatus {
+  MINT
+  LIST
+  LIST_CANCEL
+  OFFER
+  OFFER_CANCEL
+  PURCHASE
+  SELL
+  REDEEM
+}
