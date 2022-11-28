@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
-import { my_nft_con } from "src/@generated";
-import { PrismaService } from "src/services/prisma/prisma.service";
+import { my_nft_con } from "../@generated";
+import { PrismaService } from "../services/prisma/prisma.service";
 
 import { NewRecipeInput } from "./dto/new-recipe.input";
 import { RecipesArgs } from "./dto/recipes.args";
