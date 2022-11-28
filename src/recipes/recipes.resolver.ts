@@ -2,6 +2,8 @@ import { NotFoundException } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { PubSub } from "graphql-subscriptions";
 
+import { my_nft_con } from "src/@generated";
+
 import { NewRecipeInput } from "./dto/new-recipe.input";
 import { RecipesArgs } from "./dto/recipes.args";
 import { Recipe } from "./models/recipe.model";
@@ -20,6 +22,11 @@ export class RecipesResolver {
       throw new NotFoundException(id);
     }
     return recipe;
+  }
+
+  @Query((returns) => my_nft_con)
+  async myNftCon(): Promise<my_nft_con> {
+    return this.recipesService.findOne();
   }
 
   @Query((returns) => [Recipe])

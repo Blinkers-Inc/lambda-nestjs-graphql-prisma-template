@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
+import { my_nft_con } from "src/@generated";
 import { PrismaService } from "src/services/prisma/prisma.service";
 
 import { NewRecipeInput } from "./dto/new-recipe.input";
@@ -14,6 +15,10 @@ export class RecipesService {
    * Put some real business logic here
    * Left for demonstration purposes
    */
+
+  async findOne(): Promise<my_nft_con> {
+    return this.prisma.my_nft_con.findFirstOrThrow();
+  }
 
   async create(data: NewRecipeInput): Promise<Recipe> {
     return {} as any;

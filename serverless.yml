@@ -29,6 +29,8 @@ custom:
     layersDeploymentBucket: lambda-nestjs-graphql-prisma-layers-${self:provider.stage}
   webpack:
     includeModules:
+      forceInclude:
+        - prisma-nestjs-graphql # prisma ts type 파일 생성 라이브러리 (src/@generated)
       forceExclude:
         - graphql # layers 내 graphql과 버전 conflict로 인해 제외
 
