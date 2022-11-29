@@ -8,6 +8,7 @@ let cachedServer;
 
 export const handler = async (event, context, callback) => {
   if (!cachedServer) {
+    context.callbackWaitsForEmptyEventLoop = false;
     const nestApp = await NestFactory.create(AppModule);
     nestApp.useGlobalPipes(new ValidationPipe());
     await nestApp.init();
