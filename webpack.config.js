@@ -6,11 +6,6 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 const { isLocal } = slsw.lib.webpack;
 
-const lazyImports = [
-  '@nestjs/microservices/microservices-module',
-  '@nestjs/websockets/socket-module',
-];
-
 module.exports = {
   target: "node",
   stats: "normal",
@@ -39,7 +34,7 @@ module.exports = {
     ],
   },
   output: {
-    libraryTarget: "commonjs2",
+    libraryTarget: "commonjs",
     filename: "[name].js",
     path: path.resolve(__dirname, ".webpack"),
   },

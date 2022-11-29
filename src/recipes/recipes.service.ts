@@ -9,7 +9,7 @@ import { Recipe } from "./models/recipe.model";
 
 @Injectable()
 export class RecipesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
   /**
    * MOCK
    * Put some real business logic here

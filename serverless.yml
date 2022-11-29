@@ -7,6 +7,7 @@ useDotenv: true
 provider:
   name: aws
   runtime: nodejs14.x
+  memorySize: 512
   profile: blinkers
   stage: ${opt:stage, 'dev'}
   region: ap-northeast-2 # or whatever your region is
