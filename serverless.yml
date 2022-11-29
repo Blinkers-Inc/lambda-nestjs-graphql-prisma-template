@@ -6,35 +6,31 @@ useDotenv: true
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   memorySize: 512
   timeout: 30 # attached to API Gateway so it's automatically limited to 30 seconds.
   profile: blinkers
   stage: ${opt:stage, 'dev'}
-  region: ap-northeast-2 # or whatever your region is
-  deploymentBucket:
-    name: lambda-nestjs-graphql-prisma-${self:provider.stage}
-    serverSideEncryption: AES256
+  region: ap-northeast-2
 
 plugins:
   - serverless-dotenv-plugin
-  - serverless-layers
   - serverless-webpack
   - serverless-webpack-prisma
   - serverless-offline
 
 custom:
-  serverless-layers:
-    functions:
-      - api
-    dependenciesPath: ./package.json
-    layersDeploymentBucket: lambda-nestjs-graphql-prisma-layers-${self:provider.stage}
   webpack:
     includeModules:
       forceInclude:
         - prisma-nestjs-graphql # prisma ts type 파일 생성 라이브러리 (src/@generated)
       forceExclude:
-        - graphql # layers 내 graphql과 버전 conflict로 인해 제외
+        - aws-sdk
+    packagerOptions:
+      scripts:
+        - prisma generate
+        - npx rimraf "node_modules/@types"
+        - npx rimraf "node_modules/aws-sdk"
 
 package:
   individually: true
