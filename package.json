@@ -7,10 +7,10 @@
     "db:generate": "prisma generate",
     "db:pull:dev": "dotenv -e .env.dev -- npx prisma db pull",
     "db:push:dev": "dotenv -e .env.dev -- npx prisma db push",
-    "prebuild": "rimraf dist & rimraf .serverless",
+    "prebuild": "rimraf dist & rimraf .serverless & rimraf .webpack",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start:off": "npm run generate && npm run build && npx serverless offline --httpPort 4000 --stage dev --verbose",
+    "start:off": "npm run db:generate && npm run build && npx serverless offline --httpPort 4000 --stage dev --verbose",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -40,9 +40,11 @@
     "graphql": "^16.6.0",
     "graphql-query-complexity": "^0.11.0",
     "graphql-subscriptions": "^2.0.0",
+    "nest-winston": "^1.8.0",
     "prisma-nestjs-graphql": "^17.0.2",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.5.5"
+    "rxjs": "^7.5.5",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^9.2.2",

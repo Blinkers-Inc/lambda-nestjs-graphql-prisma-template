@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 
-import { my_nft_con } from "../@generated";
+import { User } from "../@generated";
 import { PrismaService } from "../services/prisma/prisma.service";
 
 import { NewRecipeInput } from "./dto/new-recipe.input";
@@ -16,8 +16,8 @@ export class RecipesService {
    * Left for demonstration purposes
    */
 
-  async findOne(): Promise<my_nft_con> {
-    return this.prisma.my_nft_con.findFirstOrThrow();
+  async findOne(): Promise<User> {
+    return this.prisma.user.findFirstOrThrow();
   }
 
   async create(data: NewRecipeInput): Promise<Recipe> {
@@ -29,11 +29,11 @@ export class RecipesService {
   }
 
   async findAll(recipesArgs: RecipesArgs): Promise<Recipe[]> {
-    const myNftCon = await this.prisma.my_nft_con.findFirst();
+    const myNftCon = await this.prisma.user.findFirst();
     return [
       {
-        id: myNftCon.uuid,
-        title: myNftCon.seller_id,
+        id: myNftCon.id.toString(),
+        title: myNftCon.id.toString(),
         description: "hh",
         creationDate: new Date(),
         ingredients: ["파", "고추"],

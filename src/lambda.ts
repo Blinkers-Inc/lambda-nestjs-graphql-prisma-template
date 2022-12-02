@@ -1,16 +1,19 @@
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { configure as serverlessExpress } from "@vendia/serverless-express";
+import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 
 import { AppModule } from "./app.module";
 
 let cachedServer;
 
 export const handler = async (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
+
   if (!cachedServer) {
-    context.callbackWaitsForEmptyEventLoop = false;
     const nestApp = await NestFactory.create(AppModule);
-    nestApp.useGlobalPipes(new ValidationPipe());
+    nestApp.useGlobalPipes(new ValidationPipe({ transform: true }));
+    nestApp.useLogger(nestApp.get(WINSTON_MODULE_NEST_PROVIDER));
     await nestApp.init();
 
     cachedServer = serverlessExpress({

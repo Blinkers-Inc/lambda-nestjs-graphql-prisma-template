@@ -2,7 +2,9 @@ import { NotFoundException } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { PubSub } from "graphql-subscriptions";
 
-import { my_nft_con } from "../@generated";
+import { PrismaService } from "src/services/prisma/prisma.service";
+
+import { User } from "../@generated";
 
 import { NewRecipeInput } from "./dto/new-recipe.input";
 import { RecipesArgs } from "./dto/recipes.args";
@@ -13,7 +15,10 @@ const pubSub = new PubSub();
 
 @Resolver((of) => Recipe)
 export class RecipesResolver {
-  constructor(private readonly recipesService: RecipesService) {}
+  constructor(
+    private readonly recipesService: RecipesService,
+    private readonly prisma: PrismaService
+  ) {}
 
   @Query((returns) => Recipe)
   async recipe(@Args("id") id: string): Promise<Recipe> {
@@ -24,8 +29,8 @@ export class RecipesResolver {
     return recipe;
   }
 
-  @Query((returns) => my_nft_con)
-  async myNftCon(): Promise<my_nft_con> {
+  @Query((returns) => User)
+  async user(): Promise<User> {
     return this.recipesService.findOne();
   }
 
