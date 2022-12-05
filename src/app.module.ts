@@ -1,12 +1,7 @@
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
 import { DirectiveLocation, GraphQLDirective } from "graphql";
-import {
-  utilities as nestWinstonModuleUtilities,
-  WinstonModule,
-} from "nest-winston";
-import winston from "winston";
 
 import { upperDirectiveTransformer } from "./common/directives/upper-case.directive";
 import { RecipesModule } from "./recipes/recipes.module";
@@ -30,20 +25,7 @@ import { RecipesModule } from "./recipes/recipes.module";
         ],
       },
     }),
-    WinstonModule.forRoot({
-      transports: [
-        new winston.transports.Console({
-          level: process.env.NODE_ENV === "production" ? "info" : "silly",
-          format: winston.format.combine(
-            winston.format.timestamp(),
-            nestWinstonModuleUtilities.format.nestLike("MyApp", {
-              colors: true,
-              prettyPrint: true,
-            })
-          ),
-        }),
-      ],
-    }),
   ],
+  providers: [Logger],
 })
 export class AppModule {}
