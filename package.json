@@ -10,7 +10,7 @@
     "prebuild": "rimraf dist & rimraf .serverless & rimraf .webpack",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start:off": "npm run db:generate && npm run build && npx serverless offline --httpPort 4000 --stage dev --verbose",
+    "start:off": "npm run db:generate && npm run build && npx serverless offline --stage dev --httpPort 4000 --verbose",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

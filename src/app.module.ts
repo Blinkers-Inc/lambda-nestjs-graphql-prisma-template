@@ -1,9 +1,15 @@
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
-import { Logger, Module } from "@nestjs/common";
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
-import { DirectiveLocation, GraphQLDirective } from "graphql";
+import { DirectiveLocation, GraphQLDirective, GraphQLError } from "graphql";
 
 import { upperDirectiveTransformer } from "./common/directives/upper-case.directive";
+import { LoggerMiddleware } from "./middlewares/logger.middleware";
 import { RecipesModule } from "./recipes/recipes.module";
 
 @Module({
@@ -16,6 +22,19 @@ import { RecipesModule } from "./recipes/recipes.module";
       autoSchemaFile: true,
       transformSchema: (schema) => upperDirectiveTransformer(schema, "upper"),
       installSubscriptionHandlers: true,
+      formatError: (err: GraphQLError) => {
+        if (err?.extensions?.exception && !err.extensions.exception.code) {
+          err.extensions.exception.code = "SYSTEM_DEFAULT";
+        }
+
+        return err;
+      },
+      plugins: [
+        // ApolloServerPluginUsageReporting({
+        //   sendVariableValues: { all: true },
+        //   sendHeaders: { all: true },
+        // }),
+      ],
       buildSchemaOptions: {
         directives: [
           new GraphQLDirective({
@@ -26,6 +45,11 @@ import { RecipesModule } from "./recipes/recipes.module";
       },
     }),
   ],
-  providers: [Logger],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes({ path: "/graphql", method: RequestMethod.ALL });
+  }
+}
