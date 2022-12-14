@@ -1,0 +1,17 @@
+version: "3"
+
+volumes:
+  db-data:
+
+
+services:
+  db:
+    image: postgres:13
+    container_name: training_database
+    volumes:
+      - db-data:/var/lib/postgresql/training_db/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password

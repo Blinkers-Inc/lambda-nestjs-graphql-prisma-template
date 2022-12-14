@@ -2,14 +2,14 @@ import { NotFoundException } from "@nestjs/common";
 import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { PubSub } from "graphql-subscriptions";
 
-import { PrismaService } from "src/services/prisma/prisma.service";
+import { Public } from "src/auth/decorators/skip-auth.decorator";
 
-import { User } from "../@generated";
+import { PrismaService } from "../prisma/prisma.service";
 
 import { NewRecipeInput } from "./dto/new-recipe.input";
 import { RecipesArgs } from "./dto/recipes.args";
 import { Recipe } from "./models/recipe.model";
-import { RecipesService } from "./recipes.service";
+import { RecipesService } from "./recipe.service";
 
 const pubSub = new PubSub();
 
@@ -20,6 +20,7 @@ export class RecipesResolver {
     private readonly prisma: PrismaService
   ) {}
 
+  @Public()
   @Query((returns) => Recipe)
   async recipe(@Args("id") id: string): Promise<Recipe> {
     const recipe = await this.recipesService.findOneById(id);
@@ -27,11 +28,6 @@ export class RecipesResolver {
       throw new NotFoundException(id);
     }
     return recipe;
-  }
-
-  @Query((returns) => User)
-  async user(): Promise<User> {
-    return this.recipesService.findOne();
   }
 
   @Query((returns) => [Recipe])

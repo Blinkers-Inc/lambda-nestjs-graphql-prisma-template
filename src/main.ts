@@ -1,13 +1,15 @@
-import { ValidationPipe } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
+import { initializeNestApp } from "./lambda";
 
-import { AppModule } from "./app.module";
+declare const module: any;
 
 async function bootstrap() {
-  const nestApp = await NestFactory.create(AppModule);
-  nestApp.useGlobalPipes(new ValidationPipe());
-
+  const nestApp = await initializeNestApp();
   await nestApp.listen(3000);
-  console.log(`Application is running on: ${await nestApp.getUrl()}`);
+  console.log(`Application is running on: http://localhost:3000/graphql`);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => nestApp.close());
+  }
 }
 bootstrap();

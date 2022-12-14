@@ -34,7 +34,7 @@ module.exports = {
     ],
   },
   output: {
-    libraryTarget: "commonjs",
+    libraryTarget: "commonjs2",
     filename: "[name].js",
     path: path.resolve(__dirname, ".webpack"),
   },

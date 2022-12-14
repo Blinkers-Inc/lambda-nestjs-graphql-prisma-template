@@ -35,6 +35,7 @@ export class ComplexityPlugin implements ApolloServerPlugin {
             `Query is too complex: ${complexity}. Maximum allowed complexity: 20`
           );
         }
+
         console.log("Query Complexity:", complexity);
       },
     };

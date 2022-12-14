@@ -1,4 +1,4 @@
-service: lambda-nestjs-graphql-prisma
+service: nestjs-app
 
 frameworkVersion: "3"
 
@@ -6,31 +6,51 @@ useDotenv: true
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs14.x
   memorySize: 512
   timeout: 30 # attached to API Gateway so it's automatically limited to 30 seconds.
   profile: blinkers
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'staging'}
   region: ap-northeast-2
+  vpc: # connect RDS (aws aurora)
+    securityGroupIds:
+      - ${env:SECURITY_GROUP_ID}
+    subnetIds:
+      - ${env:SUBNET_ID_1}
+      - ${env:SUBNET_ID_2}
+      - ${env:SUBNET_ID_3}
+      - ${env:SUBNET_ID_4}
+  deploymentBucket:
+    name: ${self:service}-${self:provider.stage}-bucket
+    serverSideEncryption: AES256
+  environment:
+    SERVERLESS_ENV: ${self:provider.stage}
 
 plugins:
   - serverless-dotenv-plugin
   - serverless-webpack
   - serverless-webpack-prisma
+  - serverless-deployment-bucket
   - serverless-offline
 
 custom:
+  serverless-offline:
+    httpPort: 4000
+    reloadHandler: true
   webpack:
     includeModules:
       forceInclude:
         - prisma-nestjs-graphql # prisma ts type 파일 생성 라이브러리 (src/@generated)
-      forceExclude:
-        - aws-sdk
+        - "@nestjs/platform-express" # Node.js 14의 externals 에 포함되지 않아 강제로 포함
+        - apollo-server-core # Node.js 14의 externals에 포함되지 않아 강제로 포함
+        - apollo-server-express
+        - class-transformer
     packagerOptions:
       scripts:
-        - prisma generate
         - npx rimraf "node_modules/@types"
         - npx rimraf "node_modules/aws-sdk"
+  deploymentBucket: # used by serverless-deployment-bucket
+    blockPublicAccess: true
 
 package:
   individually: true
